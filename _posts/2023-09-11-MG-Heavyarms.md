@@ -23,9 +23,9 @@ product:
     zh: "1/100"
     ja: "1/100"
   name:
-    en: "MG Gundam Heavyarms Custom (EW)"
-    zh: "MG重武装高达改（EW）"
-    ja: "MG ガンダムヘビーアームズ改（EW）"
+    en: "XXXG-01H2 Gundam Heavyarms Custom (EW)"
+    zh: "XXXG-01H2 重武装高达改（EW）"
+    ja: "XXXG-01H2 ガンダムヘビーアームズ改（EW）"
 ---
 
 <!-- lang:en -->
