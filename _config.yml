@@ -1,0 +1,38 @@
+# ===== 站点基本信息 =====
+title: Vanadium的小站
+description: Vanadium 的个人主页 / Vanadium's homepage
+url: https://ouweifan.github.io
+baseurl: ""
+lang: zh
+
+# ===== 社交主页链接（把下面换成你自己的主页地址）=====
+social:
+  bilibili:  "https://space.bilibili.com/11184448"
+  steam:     "https://steamcommunity.com/id/vanadiumo"
+  bangumi:   "https://bgm.tv/user/vanadium"
+  hpoi:      "https://www.hpoi.net/user/167882"
+  instagram: "https://www.instagram.com/vanadiumowf"
+  twitter:   "https://x.com/VanadiumOWF"
+
+# ===== 构建设置 =====
+markdown: kramdown
+permalink: /works/:title/        # 作品页地址形如 /works/lorem-ipsum-one/
+
+sass:
+  style: compressed
+
+# 文章默认套用 work 布局，发文时无需手写 layout
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: work
+
+# 这些文件/目录不输出到站点
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - vendor
+  - .bundle

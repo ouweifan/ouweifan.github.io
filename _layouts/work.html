@@ -1,0 +1,120 @@
+---
+layout: default
+---
+<article class="work">
+
+  <a class="back-link" href="{{ '/' | relative_url }}">
+    <span data-lang="en">{{ site.data.ui.en.back }}</span>
+    <span data-lang="zh">{{ site.data.ui.zh.back }}</span>
+    <span data-lang="ja">{{ site.data.ui.ja.back }}</span>
+  </a>
+
+  <header class="work-header">
+    <h1 class="work-title">
+      <span data-lang="en">{{ page.title.en }}</span>
+      <span data-lang="zh">{{ page.title.zh }}</span>
+      <span data-lang="ja">{{ page.title.ja }}</span>
+    </h1>
+    <time class="meta">{{ page.date | date: "%Y.%m.%d" }}</time>
+  </header>
+
+  {% if page.cover %}
+  <div class="work-cover"><img src="{{ page.cover }}" alt=""></div>
+  {% endif %}
+
+  {%- comment -%}
+    按 <!-- lang:xx --> 注释把正文切成三段。split 链顺序无关：
+    先取该标记之后的内容，再切到下一个标记之前。
+  {%- endcomment -%}
+  {% assign en = content | split: "<!-- lang:en -->" | last | split: "<!-- lang:" | first %}
+  {% assign zh = content | split: "<!-- lang:zh -->" | last | split: "<!-- lang:" | first %}
+  {% assign ja = content | split: "<!-- lang:ja -->" | last | split: "<!-- lang:" | first %}
+  {% assign product_brand = page.product.brand | default: page.brand %}
+  {% assign product_line = page.product.line | default: page.product_line %}
+  {% assign product_scale = page.product.scale | default: page.scale %}
+  {% assign product_name = page.product.name | default: page.product_name %}
+
+  <div class="work-body markdown">
+    <div class="lang-section" data-lang="en">{{ en }}</div>
+    <div class="lang-section" data-lang="zh">{{ zh }}</div>
+    <div class="lang-section" data-lang="ja">{{ ja }}</div>
+  </div>
+
+  {% if product_brand or product_line or product_scale or product_name %}
+  <div class="product-info">
+    <div class="product-info-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>
+              <span data-lang="en">Brand</span>
+              <span data-lang="zh">品牌</span>
+              <span data-lang="ja">ブランド</span>
+            </th>
+            <th>
+              <span data-lang="en">Product line</span>
+              <span data-lang="zh">产品线</span>
+              <span data-lang="ja">シリーズ</span>
+            </th>
+            <th>
+              <span data-lang="en">Scale</span>
+              <span data-lang="zh">比例</span>
+              <span data-lang="ja">スケール</span>
+            </th>
+            <th>
+              <span data-lang="en">Product name</span>
+              <span data-lang="zh">产品名</span>
+              <span data-lang="ja">製品名</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              {% if product_brand.en or product_brand.zh or product_brand.ja %}
+                <span data-lang="en">{{ product_brand.en | default: product_brand.zh | default: product_brand.ja | default: "—" }}</span>
+                <span data-lang="zh">{{ product_brand.zh | default: product_brand.en | default: product_brand.ja | default: "—" }}</span>
+                <span data-lang="ja">{{ product_brand.ja | default: product_brand.en | default: product_brand.zh | default: "—" }}</span>
+              {% else %}
+                {{ product_brand | default: "—" }}
+              {% endif %}
+            </td>
+            <td>
+              {% if product_line.en or product_line.zh or product_line.ja %}
+                <span data-lang="en">{{ product_line.en | default: product_line.zh | default: product_line.ja | default: "—" }}</span>
+                <span data-lang="zh">{{ product_line.zh | default: product_line.en | default: product_line.ja | default: "—" }}</span>
+                <span data-lang="ja">{{ product_line.ja | default: product_line.en | default: product_line.zh | default: "—" }}</span>
+              {% else %}
+                {{ product_line | default: "—" }}
+              {% endif %}
+            </td>
+            <td>
+              {% if product_scale.en or product_scale.zh or product_scale.ja %}
+                <span data-lang="en">{{ product_scale.en | default: product_scale.zh | default: product_scale.ja | default: "—" }}</span>
+                <span data-lang="zh">{{ product_scale.zh | default: product_scale.en | default: product_scale.ja | default: "—" }}</span>
+                <span data-lang="ja">{{ product_scale.ja | default: product_scale.en | default: product_scale.zh | default: "—" }}</span>
+              {% else %}
+                {{ product_scale | default: "—" }}
+              {% endif %}
+            </td>
+            <td>
+              {% if product_name.en or product_name.zh or product_name.ja %}
+                <span data-lang="en">{{ product_name.en | default: product_name.zh | default: product_name.ja }}</span>
+                <span data-lang="zh">{{ product_name.zh | default: product_name.en | default: product_name.ja }}</span>
+                <span data-lang="ja">{{ product_name.ja | default: product_name.en | default: product_name.zh }}</span>
+              {% elsif product_name %}
+                {{ product_name }}
+              {% else %}
+                <span data-lang="en">{{ page.title.en }}</span>
+                <span data-lang="zh">{{ page.title.zh }}</span>
+                <span data-lang="ja">{{ page.title.ja }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+</article>

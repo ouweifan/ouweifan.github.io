@@ -1,0 +1,406 @@
+---
+# 这两行空 front matter 是必须的，Jekyll 借此把 .scss 编译成 .css
+---
+
+/* ===== 设计变量（亮 / 暗两套） ===== */
+:root,
+html[data-theme="light"] {
+  --bg:#fafafa;
+  --surface:#ffffff;
+  --text:#1a1a1a;
+  --muted:#6b7280;
+  --accent:#2dd4bf;          /* 薄荷绿点缀 */
+  --accent-ink:#0f766e;
+  --border:#ececec;
+  --header-bg:rgba(250,250,250,.82);   /* 顶栏半透明底，配合毛玻璃 */
+  --code-bg:rgba(26,26,26,.07);
+  --accent-soft:rgba(45,212,191,.16);
+  --accent-faint:rgba(45,212,191,.08);
+  --shadow:0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.05);
+  --radius:16px;
+  --orbit-rot:14deg;
+  --hero-shadow:0 1px 3px rgba(255,255,255,.55), 0 1px 1px rgba(0,0,0,.12);
+}
+html[data-theme="dark"] {
+  --bg:#0f1115;
+  --surface:#171a21;
+  --text:#e8eaed;
+  --muted:#9aa0a6;
+  --accent:#2dd4bf;
+  --accent-ink:#5eead4;
+  --border:#262a33;
+  --header-bg:rgba(15,17,21,.82);
+  --code-bg:rgba(232,234,237,.10);
+  --accent-soft:rgba(45,212,191,.20);
+  --accent-faint:rgba(45,212,191,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  --radius:16px;
+  --cloud:rgba(120,134,170,.8);
+  --orbit-rot:194deg;
+  --hero-shadow:0 2px 10px rgba(0,0,0,.55);
+}
+
+/* ===== 基础 ===== */
+*, *::before, *::after { box-sizing:border-box; }
+html { -webkit-text-size-adjust:100%; background:var(--bg); } /* 兜底底色：天空层未渲染时不白屏 */
+body {
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  background:transparent;                 /* 透出固定的 .sky 天空层 */
+  color:var(--text);
+  line-height:1.7;
+  transition:color .25s ease;
+}
+img { max-width:100%; height:auto; display:block; }
+a { color:inherit; text-decoration:none; }
+.container { width:100%; max-width:1120px; margin:0 auto; padding:0 20px; }
+/* 注意：main 同时带 .container，需用 main.container 才能盖过 .container 的 padding:0 20px */
+main.container { padding-top:48px; padding-bottom:76px; }
+
+/* ===== 语言可见性：只显示当前 <html lang> 对应的内容 ===== */
+[data-lang] { display:none; }
+html[lang="en"] [data-lang="en"],
+html[lang="zh"] [data-lang="zh"],
+html[lang="ja"] [data-lang="ja"] { display:revert; }
+
+/* ===== Topbar（博客式：左导航 + 右社交图标，无标题） ===== */
+.topbar {
+  position:sticky; top:0; z-index:50;
+  backdrop-filter:saturate(180%) blur(10px);
+  -webkit-backdrop-filter:saturate(180%) blur(10px);
+  background:var(--header-bg);
+  border-bottom:1px solid var(--border);
+}
+/* 顶部回弹/下拖超界时，顶栏色向上延伸盖住露出的天空缝（sticky 即为本伪元素的包含块） */
+.topbar::before {
+  content:""; position:absolute; left:0; right:0; bottom:100%; height:100vh;
+  background:var(--header-bg);   /* 不加 backdrop-filter：常态在屏外，省掉一层昂贵的 100vh 模糊层、减轻切页卡顿 */
+  pointer-events:none;
+}
+.topbar-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:60px; }
+
+.nav-main { display:flex; align-items:center; gap:4px; }
+.nav-link {
+  position:relative; padding:6px 12px; border-radius:8px;
+  font-weight:600; font-size:.95rem; color:var(--text);
+  transition:color .18s ease;
+}
+.nav-link::after {
+  content:""; position:absolute; left:12px; right:12px; bottom:2px; height:2px;
+  background:var(--accent); border-radius:2px;
+  transform:scaleX(0); transform-origin:left; transition:transform .22s ease;
+}
+.nav-link:hover { color:var(--accent-ink); }
+.nav-link:hover::after { transform:scaleX(1); }
+.nav-link[aria-current="page"] { color:var(--accent-ink); }
+.nav-link[aria-current="page"]::after { transform:scaleX(1); }
+
+.nav-social { display:flex; align-items:center; gap:2px; }
+.icon-link {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:10px; color:var(--muted);
+  transition:color .18s ease, transform .18s ease, background-color .18s ease;
+}
+.icon-link svg { width:19px; height:19px; }
+.icon-link:hover { color:var(--brand, var(--accent-ink)); background:var(--accent-faint); transform:translateY(-2px) scale(1.08); }
+.il-bilibili  { --brand:#FB7299; }
+.il-steam     { --brand:#66C0F4; }
+.il-instagram { --brand:#E4405F; }
+.il-x         { --brand:var(--text); }
+.il-hpoi      { --brand:#2E9BD6; }
+/* Bangumi 图标恒为官方四色，hover 只做位移/放大 */
+
+/* 键盘可达性：清晰的焦点环 */
+.nav-link:focus-visible, .icon-link:focus-visible, .card:focus-visible,
+.lang-switch button:focus-visible, .theme-toggle:focus-visible {
+  outline:2px solid var(--accent); outline-offset:3px; border-radius:10px;
+}
+
+/* ===== 右下角浮动控件（语言 + 亮暗，低存在感） ===== */
+.floating-controls {
+  position:fixed; right:16px; bottom:16px; z-index:60;
+  display:flex; align-items:center; gap:8px;
+  opacity:.6; transition:opacity .25s ease;
+}
+.floating-controls:hover,
+.floating-controls:focus-within { opacity:1; }
+.floating-controls .lang-switch,
+.floating-controls .theme-toggle { box-shadow:var(--shadow); }
+
+/* 分段式语言切换 */
+.lang-switch { display:inline-flex; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:3px; gap:2px; }
+.lang-switch button {
+  border:0; background:transparent; color:var(--muted);
+  font-size:.8rem; font-weight:600; cursor:pointer;
+  padding:5px 10px; border-radius:999px; line-height:1;
+  transition:background-color .18s ease, color .18s ease;
+}
+.lang-switch button:hover { color:var(--text); }
+.lang-switch button.is-active { background:var(--accent); color:#06302b; }
+
+/* 亮暗切换按钮 */
+.theme-toggle {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border-radius:999px; cursor:pointer;
+  background:var(--surface); border:1px solid var(--border); color:var(--text);
+  transition:border-color .18s ease, transform .18s ease;
+}
+.theme-toggle:hover { border-color:var(--accent); }
+.theme-toggle:active { transform:scale(.94); }
+.theme-toggle svg { width:18px; height:18px; }
+.icon-sun { display:none; }
+html[data-theme="dark"] .icon-sun { display:block; }
+html[data-theme="dark"] .icon-moon { display:none; }
+
+/* ===== 首页横幅（图 + hero 文字） ===== */
+.banner { position:relative; width:100%; height:clamp(220px, 34vw, 380px); overflow:hidden; }
+.banner-overlay {
+  position:absolute; inset:0; display:flex; align-items:flex-end; padding-bottom:24px;
+}
+.banner-name { margin:0; color:var(--text); font-size:clamp(1.8rem, 4vw, 2.6rem); letter-spacing:.5px; text-shadow:var(--hero-shadow); }
+.banner-tagline { margin:6px 0 0; color:var(--text); opacity:.9; font-weight:600; font-size:clamp(.85rem, 1.6vw, 1rem); text-shadow:var(--hero-shadow); }
+@media (prefers-reduced-motion: no-preference) {
+  .banner-overlay { animation: banner-in .9s ease both; }
+}
+@keyframes banner-in { from { opacity:0; transform:scale(1.04); } to { opacity:1; transform:scale(1); } }
+
+/* ===== 关于我：自我介绍卡片 ===== */
+.intro-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:36px 32px; max-width:720px; margin:0 auto;
+}
+.intro-name { margin:0 0 6px; font-size:2.2rem; letter-spacing:.5px; }
+.intro-tagline { margin:0 0 18px; color:var(--accent-ink); font-size:.95rem; font-weight:600; letter-spacing:.02em; }
+.intro-bio { color:var(--muted); font-size:1.05rem; line-height:1.9; }
+.intro-bio p { margin:0 0 1.05em; }
+.intro-bio p:last-child { margin-bottom:0; }
+
+.meta { font-size:.8rem; color:var(--muted); }
+
+/* ===== 首页卡片网格 ===== */
+.grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 340px)); gap:22px; justify-content:center; }
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.card:hover { transform:translateY(-4px); box-shadow:0 10px 30px rgba(0,0,0,.10); }
+.card-media { aspect-ratio:16/10; overflow:hidden; background:var(--border); }
+.card-media img { width:100%; height:100%; object-fit:cover; transition:transform .4s ease; }
+.card:hover .card-media img { transform:scale(1.05); }
+.card-body { padding:16px 18px; }
+.card-title { margin:0 0 6px; font-size:1.05rem; line-height:1.35; }
+
+/* ===== 滚动入场动效（带无 JS / 减少动画 兜底） ===== */
+html.js [data-reveal] {
+  opacity:0; transform:translateY(18px);
+  transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1);
+}
+html.js [data-reveal].in-view { opacity:1; transform:none; }
+.grid [data-reveal]:nth-child(2) { transition-delay:.06s; }
+.grid [data-reveal]:nth-child(3) { transition-delay:.12s; }
+.grid [data-reveal]:nth-child(4) { transition-delay:.18s; }
+.grid [data-reveal]:nth-child(5) { transition-delay:.24s; }
+.grid [data-reveal]:nth-child(6) { transition-delay:.30s; }
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal] { opacity:1 !important; transform:none !important; transition:none !important; }
+}
+
+@media (max-width:720px) {
+  .intro-card { padding:26px 20px; }
+  .topbar-inner { gap:10px; }
+  .nav-main { gap:0; }
+  .nav-link { padding:6px 9px; font-size:.9rem; }
+  .nav-social { gap:0; }
+  .icon-link { width:32px; height:32px; }
+  .icon-link svg { width:18px; height:18px; }
+}
+
+/* ===== 作品页 ===== */
+/* 半透明底板 + 毛玻璃：天空透出但正文清晰可读（首页/关于的内容本就在不透明卡片内，不受影响） */
+.work {
+  max-width:920px; margin:0 auto;
+  background:color-mix(in srgb, var(--surface) 88%, transparent);
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:30px 30px 36px;
+}
+@media (max-width:720px) { .work { padding:22px 18px 26px; } }
+.back-link { display:inline-block; color:var(--muted); font-size:.9rem; margin-bottom:18px; }
+.back-link:hover { color:var(--accent-ink); }
+.work-header { margin-bottom:22px; }
+.work-title { font-size:2rem; line-height:1.2; margin:0 0 6px; }
+.work-cover { border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); margin-bottom:28px; }
+.work-cover img { width:100%; }
+.work-cover img,
+.markdown img { cursor:zoom-in; }
+
+/* ===== 正文排版 ===== */
+.markdown { font-size:1.02rem; }
+.markdown h2 { font-size:1.4rem; margin:1.8em 0 .6em; }
+.markdown h3 { font-size:1.15rem; margin:1.5em 0 .5em; }
+.markdown p { margin:0 0 1.1em; }
+.markdown img { border-radius:12px; margin:1.4em 0; box-shadow:var(--shadow); }
+.markdown a { color:var(--accent-ink); text-decoration:underline; text-underline-offset:2px; }
+.markdown blockquote {
+  margin:1.4em 0; padding:.6em 1.1em; border-left:3px solid var(--accent);
+  color:var(--muted); background:var(--accent-faint);
+  border-radius:0 8px 8px 0;
+}
+.markdown code { background:var(--code-bg); padding:.15em .4em; border-radius:6px; font-size:.9em; }
+.markdown pre { background:var(--surface); border:1px solid var(--border); padding:16px; border-radius:12px; overflow:auto; }
+.markdown pre code { background:none; padding:0; }
+.markdown ul, .markdown ol { padding-left:1.3em; margin:0 0 1.1em; }
+.markdown li { margin:.3em 0; }
+.markdown hr { border:0; border-top:1px solid var(--border); margin:2em 0; }
+
+/* ===== 图片放大 ===== */
+.lightbox {
+  position:fixed; inset:0; z-index:100;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px; background:rgba(0,0,0,.78);
+  opacity:0; pointer-events:none; transition:opacity .18s ease;
+}
+.lightbox.is-open { opacity:1; pointer-events:auto; }
+.lightbox img {
+  max-width:min(100%, 1200px); max-height:92vh;
+  border-radius:12px; box-shadow:0 18px 60px rgba(0,0,0,.4);
+  cursor:zoom-out;
+}
+.lightbox-close {
+  position:absolute; top:16px; right:16px;
+  display:inline-flex; align-items:center; justify-content:center;
+  width:40px; height:40px; border:1px solid rgba(255,255,255,.22);
+  border-radius:999px; background:rgba(0,0,0,.42); color:#fff;
+  font-size:26px; line-height:1; cursor:pointer;
+}
+.lightbox-close:focus-visible { outline:2px solid #fff; outline-offset:3px; }
+
+/* ===== 产品信息表 ===== */
+.product-info { margin-top:2.4em; }
+.product-info-scroll { overflow-x:auto; border:1px solid var(--border); border-radius:12px; }
+.product-info table { width:100%; min-width:620px; border-collapse:collapse; background:color-mix(in srgb, var(--surface) 92%, transparent); }
+.product-info th,
+.product-info td {
+  padding:12px 14px; border-bottom:1px solid var(--border);
+  text-align:left; vertical-align:top;
+}
+.product-info th { color:var(--muted); font-size:.86rem; font-weight:700; white-space:nowrap; }
+.product-info td { font-size:.96rem; }
+.product-info tbody tr:last-child td { border-bottom:0; }
+
+/* ===== 页脚 ===== */
+.site-footer { border-top:1px solid color-mix(in srgb, var(--border) 45%, transparent); padding:28px 0; color:var(--muted); font-size:.85rem; text-align:center; }
+
+/* ===== 昼夜天空背景 ===== */
+/* 两层天空始终存在、随主题切换透明度做交叉淡变。颜色集中在这里方便调。 */
+:root {
+  --sky-day-top:#3aa0e6;  --sky-day-mid:#8fd0f2;  --sky-day-bottom:#dceffb;
+  --sun:#ffd54a;          --cloud:rgba(255,255,255,.92);
+  --sky-night-top:#0b1026;--sky-night-mid:#1a2347;--sky-night-bottom:#2b3566;
+  --moon:#f5f3e0;         --star:#ffffff;
+}
+.sky { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
+.sky-layer { position:absolute; inset:0; transition:opacity .6s ease; }
+.sky-day   { background:linear-gradient(180deg, var(--sky-day-top) 0%,   var(--sky-day-mid) 55%,   var(--sky-day-bottom) 100%); }
+.sky-night { background:linear-gradient(180deg, var(--sky-night-top) 0%, var(--sky-night-mid) 60%, var(--sky-night-bottom) 100%); }
+html[data-theme="dark"]  .sky-day   { opacity:0; }
+html[data-theme="light"] .sky-night { opacity:0; }
+
+/* 轨道：日月挂共用圆弧两端，切主题整体旋转 ~180° 升落互换 */
+.orbit { position:absolute; left:50%; top:128vh; width:0; height:0;
+  transform-origin:0 0; transform:rotate(var(--orbit-rot)); transition:transform 1s ease; z-index:1; }
+.orbit .arm { position:absolute; left:0; top:0; transition:transform 1s ease; }
+/* arm 的反向 rotate(-orbit-rot) 与轨道用同一过渡时序，二者相加恒为 0 → 本体始终竖直，仅位置沿弧移动 */
+/* 臂长 104vh（配支点 128vh）→ 日月静止在距顶 ~27vh，落在顶栏之下 */
+.arm-sun  { transform:translateY(-104vh) translate(-50%,-50%) rotate(calc(-1 * var(--orbit-rot))); }
+.arm-moon { transform:translateY( 104vh) translate(-50%,-50%) rotate(calc(-1 * var(--orbit-rot))); }
+.sun  { display:block; width:clamp(110px, 14vw, 180px); height:auto; }
+.moon { display:block; width:clamp(96px, 12vw, 150px); height:auto; }
+.sun-disk  { fill:var(--sun); }
+.moon-disk { fill:var(--moon); }
+
+/* 星星 */
+.stars { position:absolute; inset:0; width:100%; height:100%; fill:var(--star); }
+.stars circle { opacity:.85; }
+
+/* 云：共享层，昼夜都在、位置连续，仅随 --cloud 平滑变色；置于日月之上 */
+.clouds { position:absolute; inset:0; z-index:2; }
+.cloud { position:absolute; left:0; will-change:transform; }
+.cloud svg { width:100%; height:auto; display:block; will-change:transform; }
+.cloud-shape { fill:var(--cloud); transition:fill .6s ease; }
+/* 视差三档：近(大/实/快) · 中 · 远(小/淡/慢) */
+.cloud-1 { top:14%; width:clamp(180px, 22vw, 300px); opacity:.96; }
+.cloud-2 { top:30%; width:clamp(130px, 16vw, 210px); opacity:.85; }
+.cloud-3 { top:8%;  width:clamp(90px,  12vw, 150px); opacity:.60; }
+.cloud-4 { top:22%; width:clamp(160px, 20vw, 260px); opacity:.92; }
+.cloud-5 { top:38%; width:clamp(120px, 15vw, 190px); opacity:.78; }
+.cloud-6 { top:18%; width:clamp(80px,  11vw, 140px); opacity:.55; }
+
+/* 流星（默认隐形，靠动画在长周期里偶发划过；尾巴恒顺滑行方向） */
+.shooting-star {
+  position:absolute; width:120px; height:2px; border-radius:2px; opacity:0;
+  background:linear-gradient(to right, rgba(255,255,255,0), #fff);  /* 亮“头”在 +x 端 */
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.85));
+  transform-origin:center;
+}
+.ss-1 { top:10%; left:8%;  --ss-angle:25deg; }
+.ss-2 { top:18%; left:34%; --ss-angle:18deg; }
+
+/* ----- 动效：尊重 prefers-reduced-motion ----- */
+@media (prefers-reduced-motion: no-preference) {
+  .sun-halo  { animation: glow-pulse 6s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+  .moon      { animation: moon-float 9s ease-in-out infinite; }
+  .moon-halo { animation: glow-pulse 7s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+  .stars circle { animation: star-twinkle 4s ease-in-out infinite; }
+  .stars circle:nth-child(3n)   { animation-duration:5.5s; animation-delay:-1.2s; }
+  .stars circle:nth-child(3n+1) { animation-duration:6.5s; animation-delay:-2.6s; }
+  .stars circle:nth-child(4n)   { animation-duration:4.8s; animation-delay:-3.4s; }
+  .stars circle:nth-child(5n)   { animation-duration:7s;   animation-delay:-0.8s; }
+  /* 横漂：慢、各异；delay 减 --sky-t（head 注入会话流逝秒）→ 跨页位置连续不归位 */
+  .cloud-1 { animation: cloud-drift 150s linear infinite; animation-delay: calc(-10s  - var(--sky-t, 0s)); }
+  .cloud-2 { animation: cloud-drift 200s linear infinite; animation-delay: calc(-70s  - var(--sky-t, 0s)); }
+  .cloud-3 { animation: cloud-drift 280s linear infinite; animation-delay: calc(-130s - var(--sky-t, 0s)); }
+  .cloud-4 { animation: cloud-drift 170s linear infinite; animation-delay: calc(-40s  - var(--sky-t, 0s)); }
+  .cloud-5 { animation: cloud-drift 220s linear infinite; animation-delay: calc(-160s - var(--sky-t, 0s)); }
+  .cloud-6 { animation: cloud-drift 300s linear infinite; animation-delay: calc(-100s - var(--sky-t, 0s)); }
+  /* 内层 svg 起伏 + 呼吸，错相位 → 云一边飘一边缓缓浮动，不呆板 */
+  .cloud-1 svg { animation: cloud-bob 9s    ease-in-out infinite; animation-delay:-2s; }
+  .cloud-2 svg { animation: cloud-bob 11s   ease-in-out infinite; animation-delay:-5s; }
+  .cloud-3 svg { animation: cloud-bob 13s   ease-in-out infinite; animation-delay:-1s; }
+  .cloud-4 svg { animation: cloud-bob 7.5s  ease-in-out infinite; animation-delay:-7s; }
+  .cloud-5 svg { animation: cloud-bob 12s   ease-in-out infinite; animation-delay:-3s; }
+  .cloud-6 svg { animation: cloud-bob 14.5s ease-in-out infinite; animation-delay:-9s; }
+  /* 周期 ×10 + 可见窗口同步压窄 → 划过速度不变，但出现频率降到 1/10 */
+  .ss-1 { animation: shoot 90s  linear infinite; animation-delay:-40s;  }
+  .ss-2 { animation: shoot 130s linear infinite; animation-delay:-100s; }
+  /* 隐藏的昼夜层 + 屏外那条 arm 暂停动画，省电（云在共享层，不暂停 → 两主题都继续漂） */
+  html[data-theme="dark"]  .sky-day  *,
+  html[data-theme="light"] .sky-night *,
+  html[data-theme="light"] .arm-moon *,
+  html[data-theme="dark"]  .arm-sun  * { animation-play-state:paused; }
+}
+@keyframes glow-pulse  { 0%,100% { opacity:.55; transform:scale(1); } 50% { opacity:.9; transform:scale(1.08); } }
+@keyframes moon-float  { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+@keyframes star-twinkle{ 0%,100% { opacity:.25; } 50% { opacity:1; } }
+@keyframes cloud-drift { from { transform:translateX(-28vw); } to { transform:translateX(132vw); } }
+@keyframes cloud-bob   { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-8px) scale(1.03); } }
+@keyframes shoot {
+  0%, 99.5% { transform:rotate(var(--ss-angle)) translateX(0);     opacity:0; }
+  99.6%     { opacity:1; }
+  100%      { transform:rotate(var(--ss-angle)) translateX(72vmax); opacity:0; }
+}
+
+/* 减少动态效果：冻结所有天空动效；轨道是 transition，需单独瞬时化 */
+@media (prefers-reduced-motion: reduce) {
+  .sky * { animation:none !important; }
+  .shooting-star { display:none; }
+  .orbit, .orbit .arm { transition:none !important; }
+}
+
+/* 窄屏：收小轨道摆角，避免日月被推出右边界（横向偏移按 vh 算，竖屏会过宽） */
+@media (max-width:720px) {
+  html[data-theme="light"] { --orbit-rot:8deg; }
+  html[data-theme="dark"]  { --orbit-rot:188deg; }
+}

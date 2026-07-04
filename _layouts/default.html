@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- lang / data-theme 的最终值由 head.html 里的防闪烁脚本在首屏绘制前注入 -->
+<html lang="zh" data-theme="light">
+{% include head.html %}
+<body>
+  {% include sky.html %}
+  {% include header.html %}
+  {% include banner.html %}
+  <main class="container">
+    {{ content }}
+  </main>
+  {% include footer.html %}
+  {% include controls.html %}
+  <script src="{{ '/assets/js/app.js' | relative_url }}"></script>
+</body>
+</html>

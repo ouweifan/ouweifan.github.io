@@ -1,0 +1,15 @@
+<!-- 全宽横幅：仅当页面 front matter 设置了 banner 时才显示（目前用于首页）。 -->
+{% if page.banner %}
+<div class="banner">
+  <div class="banner-overlay">
+    <div class="container">
+      <h1 class="banner-name">Vanadium</h1>
+      <p class="banner-tagline">
+        <span data-lang="en">{{ site.data.ui.en.tagline }}</span>
+        <span data-lang="zh">{{ site.data.ui.zh.tagline }}</span>
+        <span data-lang="ja">{{ site.data.ui.ja.tagline }}</span>
+      </p>
+    </div>
+  </div>
+</div>
+{% endif %}

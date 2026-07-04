@@ -1,0 +1,21 @@
+---
+layout: default
+banner: https://picsum.photos/seed/vanadiumbanner/1600/520   # 首页横幅，之后换成你的 R2 图
+---
+<div class="grid">
+  {% for post in site.posts %}
+  <a class="card" href="{{ post.url | relative_url }}" data-reveal>
+    <div class="card-media">
+      {% if post.cover %}<img src="{{ post.cover }}" alt="" loading="lazy">{% endif %}
+    </div>
+    <div class="card-body">
+      <h3 class="card-title">
+        <span data-lang="en">{{ post.title.en }}</span>
+        <span data-lang="zh">{{ post.title.zh }}</span>
+        <span data-lang="ja">{{ post.title.ja }}</span>
+      </h3>
+      <time class="meta">{{ post.date | date: "%Y.%m.%d" }}</time>
+    </div>
+  </a>
+  {% endfor %}
+</div>

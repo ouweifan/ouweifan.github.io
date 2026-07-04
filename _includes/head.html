@@ -1,0 +1,39 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title.zh %}{{ page.title.zh }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="description" content="{{ site.description }}">
+  <link rel="icon" type="image/svg+xml" href="{{ '/assets/img/favicon.svg' | relative_url }}">
+
+  <!-- 防闪烁（No-FOUC）：在加载 CSS、绘制首屏之前就把语言与主题定好 -->
+  <script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');   // 给滚动入场动效兜底：无 JS 时 CSS 让内容直接可见
+    try {
+      // 主题：localStorage > 系统深浅色
+      var t = localStorage.getItem('theme') ||
+              (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      d.setAttribute('data-theme', t);
+
+      // 语言：localStorage > 浏览器语言（ja*→日, en*→英, 其余→中）
+      var l = localStorage.getItem('lang');
+      if (!l) {
+        var n = (navigator.language || '').toLowerCase();
+        l = n.indexOf('ja') === 0 ? 'ja' : (n.indexOf('en') === 0 ? 'en' : 'zh');
+      }
+      d.setAttribute('lang', l);
+
+      // 云漂移跨页连续：以会话起点为基准注入已流逝秒数 → CSS 用负 delay 续上位置（首屏前生效，无跳动）
+      var ep = sessionStorage.getItem('skyEpoch');
+      if (!ep) { ep = Date.now(); sessionStorage.setItem('skyEpoch', String(ep)); }
+      d.style.setProperty('--sky-t', ((Date.now() - ep) / 1000) + 's');
+    } catch (e) {
+      d.setAttribute('data-theme', 'light');
+      d.setAttribute('lang', 'zh');
+    }
+  })();
+  </script>
+
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>

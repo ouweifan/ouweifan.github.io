@@ -1,0 +1,30 @@
+---
+layout: default
+permalink: /about/
+banner: https://picsum.photos/seed/vanadiumabout/1600/520   # 关于我页横幅，之后换成你的 R2 图
+---
+<div class="intro-card" data-reveal>
+  <div class="intro-bio">
+    <div data-lang="en">
+      {% assign en_bio = site.data.ui.en.bio | newline_to_br | split: "<br />" %}
+      {% for paragraph in en_bio %}
+        {% assign paragraph_text = paragraph | strip %}
+        {% if paragraph_text != "" %}<p>{{ paragraph_text }}</p>{% endif %}
+      {% endfor %}
+    </div>
+    <div data-lang="zh">
+      {% assign zh_bio = site.data.ui.zh.bio | newline_to_br | split: "<br />" %}
+      {% for paragraph in zh_bio %}
+        {% assign paragraph_text = paragraph | strip %}
+        {% if paragraph_text != "" %}<p>{{ paragraph_text }}</p>{% endif %}
+      {% endfor %}
+    </div>
+    <div data-lang="ja">
+      {% assign ja_bio = site.data.ui.ja.bio | newline_to_br | split: "<br />" %}
+      {% for paragraph in ja_bio %}
+        {% assign paragraph_text = paragraph | strip %}
+        {% if paragraph_text != "" %}<p>{{ paragraph_text }}</p>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
